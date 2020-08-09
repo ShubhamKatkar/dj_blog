@@ -25,7 +25,7 @@ SECRET_KEY = 'sr8ewy_4ib)#c#r6vh(-9aktvq5+eau9%z0f5=ux!%9h+7c(2@'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['shubhampydjblog.herokuapp.com']  # add heroku url hrer
 
 
 # Application definition
@@ -121,7 +121,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
-
+# heroku setting
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
