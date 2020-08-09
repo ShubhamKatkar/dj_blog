@@ -1,0 +1,324 @@
+# views.py code 23 july its chang on 24 july for email adding into rgister page................
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
+
+
+# Create your views here.
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+       #form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            messages.success(request, f'Account Created Successfully \
+                for user {username} !!!')
+            return redirect('blog-home')
+    else:
+        form = UserCreationForm()
+	#form = UserRegistrationForm()
+    return render(request, 'register.html', {'form': form})
+
+?*?****************************************************************
+ 
+#pydjbloag(site) old code changs for log in/logout function.
+from django.contrib import admin
+from django.urls import path, include
+
+from users import views as user_views
+
+import blog
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('blog.urls')),
+    path('register/', user_views.register, name='register'),
+
+]
+******************************************************************
+
+base.html old code 
+
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Py DJ Blog Home</title>
+    <!-- All CSS References-->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css'%}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/custom.css'%}">
+  </head>
+  <body>
+    <!--Header Start-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Py DJ Blog</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      
+        <div class="collapse navbar-collapse" id="navbarColor01">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link"  href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">About</a>
+            </li>
+        </div>
+      </nav>
+    <!--Header Ends-->
+    <br/>
+    <br/>
+    <!--Main Area Starts -->
+    <div class="container">
+        <div class="row">
+            <!--Main Area Content Starts -->
+            <div class="col-sm-8">
+              {% if messages %}
+  
+                {% for message in messages %}
+                    <div class="alert alert-{{message.tags}}">
+                      {{message}}
+                    </div>
+                {% endfor %}
+
+              {% endif %}
+                {% block content%}
+
+                {% endblock %}
+            </div>
+            <!--Main Area Content End -->
+
+            <!--Right Nav Bar Starts -->
+            <div class="col-sm-4">
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action active">
+                      Latest Posts
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                      Python Posts
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action disabled">
+                      Django Posts
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action disabled">
+                      HTML5 Posts
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action disabled">
+                      CSS Posts
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action disabled">
+                      Bootstrap Posts
+                    </a>
+                  </div>
+                  <br/>
+                  <br/>
+            </div>
+             <!--Right Nav Bar Ends -->
+        </div>
+    </div>         
+    <!--Main Area Ends -->
+     <!--Footer Start-->
+     <div class="footer">
+        <p>Py Dj Blog CopyRight@2020</p>
+    </div>
+    <!--Footer Ends-->
+
+  </body>
+</html>
+************************************************************************
+27/07/2020
+
+************************************************************************
+profile functnality...................
+
+"""pydjblog URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/3.0/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path, include
+from users import views as user_views
+from django.contrib.auth import views as auth_views
+
+import blog
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('blog.urls')),
+    path('register/', user_views.register, name='register'),
+    #path('login/', auth_views.LoginView.as_view(), name='login'),
+    #path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
+
+]
+******************************************************************
+29 july 2020
+
+# new code implimented on 24 july for email adding into registration form
+from django.shortcuts import render, redirect
+#from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
+from .forms import UserRegistrationForm
+# using decorators...(27/07/2020)
+from django.contrib.auth.decorators import login_required
+
+
+# Create your views here.
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()  # User will get stored into database
+            username = form.cleaned_data.get('username')
+            messages.success(request, f'Account Created Successfully \
+                for user {username} !!!')
+            # return redirect('blog-home')
+            return redirect('login')
+    else:
+        form = UserRegistrationForm()
+
+    return render(request, 'register.html', {'form': form})
+
+# Decorator
+
+
+@login_required
+def profile(request):
+    # return render(request, 'profile.html')
+    #(29 july 2020)
+    ### ADD karaycha aahe khali code..
+**************************************************************
+profile.html
+
+{% extends "base.html" %} {% load crispy_forms_tags %} {% block content %}
+<div class="content-section">
+  <div class="media">
+    <img
+      class="rounded-circle account-img"
+      src="{{ user.profile.image.url }}"
+    />
+    <div class="media-body">
+      <h2 class="account-heading">{{ user.username }}</h2>
+      <p class="text-secondary">{{ user.email }}</p>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+****************************************************************
+    src="{% static '../media/default.jpg' %}"
+image chya reference sathi (static image)
+*******************************************************
+**pegination code by button**
+
+blog app -> templates ->home.html 
+
+
+put below code 
+
+{% extends 'base.html'%} {% block content%}
+<div>
+  <h3><marquee>Welcome to Py Dj Blog!!!!</marquee></h3>
+  <br />
+  {% for p in posts %}
+  <div class="card border-primary mb-3">
+    <div class="card-header">
+      <img
+        class="rounded-circle article-img"
+        style="width: 45px; height: 45px;"
+        src="{{ p.author.profile.image.url }}"
+      />
+      <b
+        ><a class="article-title" href="{% url 'post-detail' p.id %}"
+          >{{ p.title }}</a
+        ></b
+      >
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-12">
+          <h6 class="card-title">
+            By - {{p.author}} On {{p.date_posted |date:"F d, Y"}}
+          </h6>
+        </div>
+      </div>
+
+      <p class="card-text">{{p.content}}</p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="pagination">
+  <span class="step-links">
+    {% if page_obj.has_previous %}
+    <a class="btn btn-outline-info mb-4" href="?page=1">&laquo; First</a>
+    <a
+      class="btn btn-outline-info mb-4"
+      href="?page={{ page_obj.previous_page_number }}"
+      >Previous</a
+    >
+    {% endif %}
+
+    <span class="current">
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+    </span>
+
+    {% if page_obj.has_next %}
+    <a
+      class="btn btn-outline-info mb-4"
+      href="?page={{ page_obj.next_page_number }}"
+      >Next</a
+    >
+    <a
+      class="btn btn-outline-info mb-4"
+      href="?page={{ page_obj.paginator.num_pages }}"
+      >Last &raquo;</a
+    >
+    {% endif %}
+  </span>
+</div>
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
